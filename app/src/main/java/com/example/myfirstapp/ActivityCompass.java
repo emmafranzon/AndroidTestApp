@@ -3,10 +3,12 @@ package com.example.myfirstapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -27,7 +29,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
     private Sensor compSensor;
 
     //TextView for degrees
-    private TextView compDegrees;
+    private TextView compDegrees, compDir;
 
     // record the angle turned of the compass picture
     private float DegreeStart = 0f;
@@ -37,8 +39,9 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        compassImage = (ImageView) findViewById(R.id.imageView3);
         compDegrees = (TextView) findViewById(R.id.compass_degrees);
+        compDir = (TextView) findViewById(R.id.compass_direction);
+        compassImage = (ImageView) findViewById(R.id.compass_image);
         //ADDED SENSOR AND LISTENER
         sm = (SensorManager) getSystemService(SENSOR_SERVICE);
         compSensor = sm.getDefaultSensor(Sensor.TYPE_ORIENTATION);
@@ -71,8 +74,40 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         // Start animation of compass image
         compassImage.startAnimation(ra);
         DegreeStart = -degree;
+        degreeChange(degree);
 
 
+    }
+
+    public void degreeChange(Float f){
+        Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if(f >= 0 && f <= 22) {
+            compDir.setText("N");
+        }
+        if(f > 22 && f < 67){
+            compDir.setText("NE");
+        }
+        if(f >= 67 && f <= 112){
+            compDir.setText("E");
+        }
+        if(f > 112 && f < 157){
+            compDir.setText("SE");
+        }
+        if(f >= 157 && f <= 202){
+            compDir.setText("S");
+        }
+        if(f > 202 && f < 247){
+            compDir.setText("SW");
+        }
+        if(f >= 247 && f <= 292){
+            compDir.setText("W");
+        }
+        if(f > 292 && f < 227){
+            compDir.setText("NW");
+        }
+        if(f >= 227 && f <= 360){
+            compDir.setText("N");
+        }
 
     }
 

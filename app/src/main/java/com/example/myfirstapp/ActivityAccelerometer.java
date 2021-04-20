@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.Vibrator;
 import android.widget.TextView;
 
 import android.os.Bundle;
@@ -41,6 +42,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
         xText.setText("X: " + round(event.values[0]));
         yText.setText("Y: " + round(event.values[1]));
         zText.setText("Z: " + round(event.values[2]));
