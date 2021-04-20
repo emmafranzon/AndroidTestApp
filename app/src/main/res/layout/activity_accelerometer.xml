@@ -7,9 +7,19 @@
     tools:context=".ActivityAccelerometer">
 
     <TextView
+        android:id="@+id/acc_background"
+        android:layout_width="491dp"
+        android:layout_height="796dp"
+        android:layout_gravity="end"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="-40dp"
+        tools:layout_editor_absoluteY="-33dp" />
+
+    <TextView
         android:id="@+id/textView2"
         android:layout_width="157dp"
         android:layout_height="44dp"
+        android:gravity="center"
         android:layout_marginTop="16dp"
         android:text="Accelerometer"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -22,6 +32,7 @@
         android:id="@+id/xText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_marginTop="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,6 +44,7 @@
         android:id="@+id/zText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -43,21 +55,35 @@
         android:id="@+id/yText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/xText" />
 
+    <ImageView
+        android:id="@+id/accImage"
+        android:layout_width="189dp"
+        android:layout_height="183dp"
+        android:src="@drawable/right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tiltText"
+        app:layout_constraintVertical_bias="0.344" />
+
     <TextView
         android:id="@+id/tiltText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
+        android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/yText" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

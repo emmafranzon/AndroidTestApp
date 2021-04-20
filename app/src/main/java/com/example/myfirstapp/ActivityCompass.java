@@ -75,8 +75,6 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         compassImage.startAnimation(ra);
         DegreeStart = -degree;
         degreeChange(degree);
-
-
     }
 
     public void degreeChange(Float f){
