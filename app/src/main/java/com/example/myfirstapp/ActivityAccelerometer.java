@@ -48,8 +48,6 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         float x = event.values[0];
         float y = event.values[1];
         tiltChange(x, y);
-
-
     }
 
     public void tiltChange(float xVal, float yVal){
