@@ -61,7 +61,6 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         float degree = event.values[0];
         compDegrees.setText("Heading: " + round(degree) + " degrees" );
         // rotation animation - reverse turn degree degrees
-
         RotateAnimation ra = new RotateAnimation(
                 DegreeStart,
                 -degree,
@@ -81,6 +80,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if(f >= 0 && f <= 22) {
             compDir.setText("N");
+            vib.vibrate(500);
         }
         if(f > 22 && f < 67){
             compDir.setText("NE");
@@ -105,6 +105,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         }
         if(f >= 227 && f <= 360){
             compDir.setText("N");
+            vib.vibrate(500);
         }
 
     }
