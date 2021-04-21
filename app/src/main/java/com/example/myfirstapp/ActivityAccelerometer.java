@@ -44,15 +44,19 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         accBackground = (TextView) findViewById(R.id.acc_background);
         img = (ImageView) findViewById(R.id.accImage);
 
-        mpLeft = MediaPlayer.create(getApplicationContext(), R.raw.mp_left);
-        mpRight = MediaPlayer.create(getApplicationContext(), R.raw.mp_right);
-        mpUpside = MediaPlayer.create(getApplicationContext(), R.raw.mp_upside);
-        mpLying = MediaPlayer.create(getApplicationContext(), R.raw.mp_lying);
+        mpLeft = MediaPlayer.create(getApplicationContext(), R.raw.left);
+        mpRight = MediaPlayer.create(getApplicationContext(), R.raw.right);
+        mpUpside = MediaPlayer.create(getApplicationContext(), R.raw.upsidedown);
+        mpLying = MediaPlayer.create(getApplicationContext(), R.raw.lying);
     }
 
     private String round(float value){
         DecimalFormat df = new DecimalFormat("##.00");
         return df.format(value);
+    }
+
+    private void pauseMP(MediaPlayer mp){
+        mp.stop();
     }
 
     @Override
@@ -62,9 +66,9 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         yText.setText("Y: " + round(event.values[1]));
         zText.setText("Z: " + round(event.values[2]));
 
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
+        float x = Math.round(event.values[0]);
+        float y = Math.round(event.values[1]);
+        float z = Math.round(event.values[2]);
         tiltChange(x, y, z);
     }
 

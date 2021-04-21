@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
@@ -78,9 +79,11 @@ public class ActivityCompass extends Activity implements SensorEventListener {
 
     public void degreeChange(Float f){
         Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        compDir.setTextColor(Color.rgb(255, 255, 255));
         if(f >= 0 && f <= 22) {
             compDir.setText("N");
-            vib.vibrate(500);
+            vib.vibrate(50);
+            compDir.setTextColor(Color.rgb(255, 0, 0));
         }
         if(f > 22 && f < 67){
             compDir.setText("NE");
@@ -105,7 +108,8 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         }
         if(f >= 227 && f <= 360){
             compDir.setText("N");
-            vib.vibrate(500);
+            compDir.setTextColor(Color.rgb(255, 0, 0));
+            vib.vibrate(50);
         }
 
     }
