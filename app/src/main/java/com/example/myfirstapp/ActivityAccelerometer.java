@@ -9,22 +9,42 @@ import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.Vibrator;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.graphics.Color;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.concurrent.TimeUnit;
 
 public class ActivityAccelerometer extends AppCompatActivity implements SensorEventListener{
-
     private TextView xText, yText, zText, tiltText, accBackground;
     private Sensor accSensor;
     private SensorManager sm;
     private ImageView img;
     private MediaPlayer mpLeft, mpRight, mpUpside, mpLying;
+    private Button pauseMP;
+    //implementera LowPass - https://www.built.io/blog/applying-low-pass-filter-to-android-sensor-s-readings
+    static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
+    private float[] accSensorVals;
+
+    //https://developer.android.com/guide/components/activities/activity-lifecycle
+    protected void onResume() {
+        super.onResume();
+        sm.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        sm.unregisterListener(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,56 +61,55 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         yText = (TextView) findViewById(R.id.yText);
         zText = (TextView) findViewById(R.id.zText);
         tiltText = (TextView) findViewById(R.id.tiltText);
+        pauseMP = (Button) findViewById(R.id.pause);
         accBackground = (TextView) findViewById(R.id.acc_background);
         img = (ImageView) findViewById(R.id.accImage);
+
 
         mpLeft = MediaPlayer.create(getApplicationContext(), R.raw.left);
         mpRight = MediaPlayer.create(getApplicationContext(), R.raw.right);
         mpUpside = MediaPlayer.create(getApplicationContext(), R.raw.upsidedown);
         mpLying = MediaPlayer.create(getApplicationContext(), R.raw.lying);
-    }
 
-    private String round(float value){
-        DecimalFormat df = new DecimalFormat("##.00");
-        return df.format(value);
-    }
-
-    private void pauseMP(MediaPlayer mp){
-        mp.stop();
+        pauseMP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseMP();
+            }
+        });
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            accSensorVals = lowPass(event.values.clone(), accSensorVals);
+        }
+        //Displays lowpass vals thus these are more keen to the eye
+        xText.setText("X: " + round(accSensorVals[0]));
+        yText.setText("Y: " + round(accSensorVals[1]));
+        zText.setText("Z: " + round(accSensorVals[2]));
 
-        xText.setText("X: " + round(event.values[0]));
-        yText.setText("Y: " + round(event.values[1]));
-        zText.setText("Z: " + round(event.values[2]));
-
-        float x = Math.round(event.values[0]);
-        float y = Math.round(event.values[1]);
-        float z = Math.round(event.values[2]);
+        //Use lowpass vals when calling tiltchange method
+        float x = Math.round(accSensorVals[0]);
+        float y = Math.round(accSensorVals[1]);
+        float z = Math.round(accSensorVals[2]);
         tiltChange(x, y, z);
     }
 
     public void tiltChange(float xVal, float yVal, float zVal){
         Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
         if(zVal > 9) {
             accBackground.setBackgroundColor(Color.rgb(255,178,102));
             tiltText.setText("LYING");
             img.setImageResource(R.drawable.lying);
             mpLying.start();
-        } else if(xVal < 4 && xVal > -4) {
-            if(yVal > 0){
-                accBackground.setBackgroundColor(Color.TRANSPARENT);
-                tiltText.setText("STANDING");
-                img.setImageResource(R.drawable.tiltphone);
-            }
-            if(yVal < 0) {
-                accBackground.setBackgroundColor(Color.rgb(255,255,102));
-                tiltText.setText("UPSIDE DOWN");
-                img.setImageResource(R.drawable.upside);
-                mpUpside.start();
-            }
+
+        } else if(xVal < 4 && xVal > -4 && yVal < 0){
+            accBackground.setBackgroundColor(Color.rgb(255,255,102));
+            tiltText.setText("UPSIDE DOWN");
+            img.setImageResource(R.drawable.upside);
+            mpUpside.start();
         } else if(xVal < -5){
             accBackground.setBackgroundColor(Color.rgb(204,153,255));
             tiltText.setText("RIGHT");
@@ -101,7 +120,43 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
             tiltText.setText("LEFT");
             img.setImageResource(R.drawable.left);
             mpLeft.start();
+            /*
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            }, 4000);
+
+             */
+        } else {
+            if (yVal > 0) {
+                //pauseMP();
+                accBackground.setBackgroundColor(Color.TRANSPARENT);
+                tiltText.setText("STANDING");
+                img.setImageResource(R.drawable.tiltphone);
+            }
         }
+        /*
+        else if(xVal < 4 && xVal > -4) {
+            if(yVal > 0){
+                if(playingMP()){
+                    pauseMP();
+                }
+                accBackground.setBackgroundColor(Color.TRANSPARENT);
+                tiltText.setText("STANDING");
+                img.setImageResource(R.drawable.tiltphone);
+            }
+            if(yVal < 0) {
+                accBackground.setBackgroundColor(Color.rgb(255,255,102));
+                tiltText.setText("UPSIDE DOWN");
+                img.setImageResource(R.drawable.upside);
+                mpUpside.start();
+            }
+        }
+
+         */
 
     }
 
@@ -109,4 +164,25 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         //not in use
     }
-}
+
+    private String round(float value){
+        DecimalFormat df = new DecimalFormat("##.00");
+        return df.format(value);
+    }
+
+    private void pauseMP() {
+        mpLeft.pause();
+        mpRight.pause();
+        mpUpside.pause();
+        mpLying.pause();
+    }
+
+    protected float[] lowPass(float[] input, float[] output ) {
+        if ( output == null ) return input;
+        for ( int i=0; i<input.length; i++ ) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+    }

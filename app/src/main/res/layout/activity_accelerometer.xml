@@ -66,12 +66,12 @@
         android:id="@+id/accImage"
         android:layout_width="189dp"
         android:layout_height="183dp"
+        android:layout_marginTop="96dp"
+        android:gravity="center"
         android:src="@drawable/tiltphone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tiltText"
-        app:layout_constraintVertical_bias="0.344" />
+        app:layout_constraintTop_toBottomOf="@+id/tiltText" />
 
     <TextView
         android:id="@+id/tiltText"
@@ -84,6 +84,17 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/yText" />
+
+    <Button
+        android:id="@+id/pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Pause"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/accImage" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

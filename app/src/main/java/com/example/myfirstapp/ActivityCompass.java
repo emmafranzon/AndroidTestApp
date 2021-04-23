@@ -1,16 +1,21 @@
 package com.example.myfirstapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -35,6 +40,25 @@ public class ActivityCompass extends Activity implements SensorEventListener {
     // record the angle turned of the compass picture
     private float DegreeStart = 0f;
 
+    //implementera LowPass - https://www.built.io/blog/applying-low-pass-filter-to-android-sensor-s-readings
+    static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
+    private float[] compSensorVals;
+
+    //Adding Media Player
+    private MediaPlayer compMP;
+
+    //https://developer.android.com/guide/components/activities/activity-lifecycle
+    protected void onResume() {
+        super.onResume();
+        sm.registerListener(this, compSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        sm.unregisterListener(this);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,19 +72,19 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         compSensor = sm.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         sm.registerListener((SensorEventListener) this, compSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-    }
-    //Rounding off heading by 2 decimals
-    private String round(float value){
-        DecimalFormat df = new DecimalFormat("##.00");
-        return df.format(value);
+        compMP = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+
     }
 
     @Override
     //https://www.codespeedy.com/simple-compass-code-with-android-studio/
     public void onSensorChanged(SensorEvent event) {
-        // get angle around the z-axis rotated
-        float degree = event.values[0];
-        compDegrees.setText("Heading: " + round(degree) + " degrees" );
+        if(event.sensor.getType() == Sensor.TYPE_ORIENTATION){
+            compSensorVals = lowPass(event.values.clone(), compSensorVals);
+        }
+        // get angle around the z-axis rotated (Azimuth directly since using orientation sensor)
+        float degree = compSensorVals[0];
+        compDegrees.setText("Precise heading: " + degree + " °" );
         // rotation animation - reverse turn degree degrees
         RotateAnimation ra = new RotateAnimation(
                 DegreeStart,
@@ -81,35 +105,38 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         compDir.setTextColor(Color.rgb(255, 255, 255));
         if(f >= 0 && f <= 22) {
-            compDir.setText("N");
-            vib.vibrate(50);
+            compDir.setText(round(f) + "° N");
             compDir.setTextColor(Color.rgb(255, 0, 0));
+            vib.vibrate(100);
+            compMP.start();
+
         }
         if(f > 22 && f < 67){
-            compDir.setText("NE");
+            compDir.setText(round(f) + "° NE");
         }
         if(f >= 67 && f <= 112){
-            compDir.setText("E");
+            compDir.setText(round(f) + "° E");
         }
         if(f > 112 && f < 157){
-            compDir.setText("SE");
+            compDir.setText(round(f) + "° SE");
         }
         if(f >= 157 && f <= 202){
-            compDir.setText("S");
+            compDir.setText(round(f) + "° S");
         }
         if(f > 202 && f < 247){
-            compDir.setText("SW");
+            compDir.setText(round(f) + "° SW");
         }
         if(f >= 247 && f <= 292){
-            compDir.setText("W");
+            compDir.setText(round(f) + "° W");
         }
-        if(f > 292 && f < 227){
-            compDir.setText("NW");
+        if(f > 292 && f < 314){
+            compDir.setText(round(f) + "° NW");
         }
-        if(f >= 227 && f <= 360){
-            compDir.setText("N");
+        if(f >= 314 && f <= 360){
+            compDir.setText(round(f) + "° N");
             compDir.setTextColor(Color.rgb(255, 0, 0));
-            vib.vibrate(50);
+            vib.vibrate(100);
+            compMP.start();
         }
 
     }
@@ -118,4 +145,22 @@ public class ActivityCompass extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // not in use
     }
+
+    protected float[] lowPass( float[] input, float[] output ) {
+        if ( output == null ) return input;
+        for ( int i=0; i<input.length; i++ ) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+    //Rounding off heading by 2 decimals
+    private String round(float value){
+        DecimalFormat df = new DecimalFormat("##.00");
+        return df.format(value);
+    }
+
+
+
+
 }
