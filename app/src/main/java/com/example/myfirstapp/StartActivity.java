@@ -8,12 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_start);
 
         //Button1
         //get the button
@@ -43,8 +43,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openCompass(){
-        //Intent intent = new Intent(this, ActivityCompass.class);
-        Intent intent = new Intent(this, StartActivity.class);
+        Intent intent = new Intent(this, ActivityCompass.class);
         startActivity(intent);
     }
 
@@ -52,6 +51,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ActivityAccelerometer.class);
         startActivity(intent);
     }
-
-
 }
