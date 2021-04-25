@@ -1,6 +1,7 @@
 package com.example.myfirstapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 
 public class ActivityAccelerometer extends AppCompatActivity implements SensorEventListener{
@@ -32,11 +34,13 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
     private SensorManager sm;
     private ImageView img;
     private MediaPlayer mpLeft, mpRight, mpUpside, mpLying;
-    private Button pauseMP;
+
     private boolean playing = false;
     //implementera LowPass - https://www.built.io/blog/applying-low-pass-filter-to-android-sensor-s-readings
     static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
     private float[] accSensorVals;
+
+    private CountDownTimer cdt;
 
     //https://developer.android.com/guide/components/activities/activity-lifecycle
     protected void onResume() {
@@ -64,7 +68,6 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         yText = (TextView) findViewById(R.id.yText);
         zText = (TextView) findViewById(R.id.zText);
         tiltText = (TextView) findViewById(R.id.tiltText);
-        pauseMP = (Button) findViewById(R.id.pause);
         accBackground = (TextView) findViewById(R.id.acc_background);
         img = (ImageView) findViewById(R.id.accImage);
         counter = (TextView) findViewById(R.id.counter);
@@ -75,6 +78,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         mpUpside = MediaPlayer.create(getApplicationContext(), R.raw.upsidedown);
         mpLying = MediaPlayer.create(getApplicationContext(), R.raw.lying);
 
+        /*
         pauseMP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,8 +88,11 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
                 }
                 onResume();
                 pauseMP();
+
             }
         });
+
+         */
     }
 
     @Override
@@ -117,7 +124,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
             mpLying.start();
             playing = true;
             //https://developer.android.com/reference/android/os/CountDownTimer.html
-            new CountDownTimer(8000, 1000) {
+            cdt = new CountDownTimer(8000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     counter.setText("seconds remaining: " + millisUntilFinished / 1000);
                 }
@@ -140,7 +147,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
             onPause();
             mpUpside.start();
             playing = true;
-            new CountDownTimer(5000, 1000) {
+            cdt = new CountDownTimer(5000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     counter.setText("seconds remaining: " + millisUntilFinished / 1000);
                 }
@@ -162,7 +169,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
             onPause();
             mpRight.start();
             playing = true;
-            new CountDownTimer(4000, 1000) {
+            cdt = new CountDownTimer(4000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     counter.setText("seconds remaining: " + millisUntilFinished / 1000);
                 }
@@ -184,7 +191,7 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
             onPause();
             mpLeft.start();
             playing = true;
-            new CountDownTimer(4000, 1000) {
+            cdt = new CountDownTimer(4000, 1000) {
                 public void onTick(long millisUntilFinished) {
                     counter.setText("seconds remaining: " + millisUntilFinished / 1000);
                 }
@@ -224,16 +231,25 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         playing = false;
         if(mpLeft.isPlaying()){
             mpLeft.pause();
+            mpLeft.seekTo(0);
+            cdt.cancel();
         }
         if(mpRight.isPlaying()){
             mpRight.pause();
+            mpRight.seekTo(0);
+            cdt.cancel();
         }
         if(mpUpside.isPlaying()){
             mpUpside.pause();
+            mpUpside.seekTo(0);
+            cdt.cancel();
         }
         if(mpLying.isPlaying()){
             mpLying.pause();
+            mpLying.seekTo(0);
+            cdt.cancel();
         }
+
     }
 
     protected float[] lowPass(float[] input, float[] output ) {
@@ -244,20 +260,32 @@ public class ActivityAccelerometer extends AppCompatActivity implements SensorEv
         return output;
     }
 
+
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle("Close Accelerometer?")
-                .setMessage("Are you sure you don't want to listen to Beyoncé one more time?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
+        if(playing == true){
+            Toast.makeText(getApplicationContext(), "Please wait until music is done playing...", Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Close Accelerometer?")
+                    .setMessage("Are you sure you don't want to listen to Beyoncé one more time?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(playing == true){
+                                pauseMP();
+                            }
+                            onPause();
+                            finish();
+                        }
 
-                })
-                .setNegativeButton("No", null)
-                .show();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
+
     }
+
     }

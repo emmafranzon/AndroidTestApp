@@ -19,9 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import android.os.Bundle;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 
@@ -85,7 +82,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         compMess = (TextView) findViewById(R.id.compass_message);
 
         pb = (ProgressBar) findViewById(R.id.progressBar);
-        procenatge = (TextView) findViewById(R.id.procentage);
+        procenatge = (TextView) findViewById(R.id.loading);
 
     }
 
@@ -98,7 +95,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         // get angle around the z-axis rotated (Azimuth directly since using orientation sensor)
         float degree = compSensorVals[0];
         compDegrees.setText("Precise heading: " + degree + " °" );
-        compMess.setText("Go as north as you can!");
+        compMess.setText("Go as north as you can! (± 12°)");
         procenatge.setText(pbStatus + " %");
         // rotation animation - reverse turn degree degrees
         RotateAnimation ra = new RotateAnimation(
@@ -123,7 +120,7 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         if(f <12 || f > 348){
             compDir.setText(round(f) + "° N");
             compDir.setTextColor(Color.rgb(255, 0, 0));
-            vib.vibrate(100);
+            vib.vibrate(10);
             compMP.setPlaybackParams(compMP.getPlaybackParams().setSpeed(speedClose));
             compMP.start();
             pbStatus++;
@@ -135,7 +132,6 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         if(f >= 12 && f <= 22) {
             compDir.setText(round(f) + "° N");
             compDir.setTextColor(Color.rgb(255, 0, 0));
-            vib.vibrate(10);
             compMP.setPlaybackParams(compMP.getPlaybackParams().setSpeed(speed));
             compMP.start();
 
@@ -164,7 +160,6 @@ public class ActivityCompass extends Activity implements SensorEventListener {
         if(f >= 314 && f <= 348){
             compDir.setText(round(f) + "° N");
             compDir.setTextColor(Color.rgb(255, 0, 0));
-            vib.vibrate(10);
             compMP.setPlaybackParams(compMP.getPlaybackParams().setSpeed(speed));
             compMP.start();
 
