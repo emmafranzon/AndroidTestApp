@@ -12,6 +12,7 @@ Projektet inledes med att stegen i [Android Developer: "Build your first app"](h
 * Två knappar till de följande aktiviteterna lades till
 * Livscykeln i de två aktiviteterna Compass och Accelerator kompletterades med en onPause och onResume för att motverka att de kördes i bakgrundem. [Android Developer: "Activity Lifecycle"](https://developer.android.com/guide/components/activities/activity-lifecycle)
 * OnBackPressed metod lades även till i båda aktiviteterna, [Stackoverflow artikel](https://stackoverflow.com/questions/2257963/how-to-show-a-dialog-to-confirm-that-the-user-wishes-to-exit-an-android-activity)
+* En dialogruta lades även till i båda aktiviteterna när OnBackPressed metoden triggas samt när progressbar i compass är 100%.
 
 ### CompassActivity
 Stegen i artikeln [Compass Tutorial (Java)](https://www.codespeedy.com/simple-compass-code-with-android-studio/) och 
@@ -22,6 +23,7 @@ Stegen i artikeln [Compass Tutorial (Java)](https://www.codespeedy.com/simple-co
 * Intervall för N, E, S och W skapades och riktningen skrivs ut, vid norr är bokstaven röd och telefonen vibrerar för att ge haptisk feedback, Mediaplayer lades till för att ge auditiv feedback (två olika lägen beroende på hur nära norr man är)
 * Behöll även constraints layout i XML filen
 * La till lowpass, [Applying Lowpass Filter article](https://www.built.io/blog/applying-low-pass-filter-to-android-sensor-s-readings)
+* En progressbar lades till för att skapa ytterligare interaktion, denna baseras på att användaren vill röra sig i norrgående riktning (± 12 °)
 
 ### AcceleromterActivity
 Stegen i följdes. Sedan gjordes följande ändringar:
